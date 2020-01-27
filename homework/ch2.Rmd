@@ -1,5 +1,7 @@
 ---
-title: "Geog 509 Chapter 2 Problem Set"
+title: |
+    | Geog 509: Bayesian Data Analysis
+    | Chapter 2 Problem Set
 author: "Jesse Piburn"
 date: "`r Sys.Date()`"
 output:

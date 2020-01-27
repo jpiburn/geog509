@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6730 64-bit) (preloaded format=pdflatex 2019.4.15)  27 JAN 2020 12:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6730 64-bit) (preloaded format=pdflatex 2019.4.15)  27 JAN 2020 12:49
 entering extended mode
 **./ch2.tex
 (ch2.tex
@@ -477,13 +477,13 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip47
 )
-Package hyperref Info: Option `unicode' set `true' on input line 30.
+Package hyperref Info: Option `unicode' set `true' on input line 29.
 ("C:\Users\pij\AppData\Local\Programs\MiKTeX 2.9\tex\latex\hyperref\puenc.def"
 File: puenc.def 2018/02/06 v6.86b Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
-Package hyperref Info: Option `breaklinks' set `true' on input line 30.
+Package hyperref Info: Option `breaklinks' set `true' on input line 29.
 ("C:\Users\pij\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\color.sty"
 Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
 
@@ -760,7 +760,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 234.
 Here is how much of TeX's memory you used:
  12466 strings out of 492973
  185299 string characters out of 3127578
- 289484 words of memory out of 3000000
+ 289360 words of memory out of 3000000
  16145 multiletter control sequences out of 15000+200000
  34331 words of font info for 46 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -781,7 +781,7 @@ m/lmsy10.pfb><C:/Users/pij/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
 /lm/lmsy7.pfb><C:/Users/pij/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/publi
 c/lm/lmtk10.pfb><C:/Users/pij/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pub
 lic/lm/lmtt10.pfb>
-Output written on ch2.pdf (3 pages, 198265 bytes).
+Output written on ch2.pdf (3 pages, 199574 bytes).
 PDF statistics:
  104 PDF objects out of 1000 (max. 8388607)
  14 named destinations out of 1000 (max. 500000)
