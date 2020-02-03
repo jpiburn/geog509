@@ -1,0 +1,128 @@
+---
+title: |
+    | Geog 509: Bayesian Data Analysis
+    | Chapter 3 Problem Set
+author: "Jesse Piburn"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 3E1 - 3E7
+```{r 3e-setup, warning=FALSE, message=FALSE}
+library(rethinking)
+
+p_grid <- seq(from = 0,to = 1,length.out = 1000) 
+prior <- rep( 1 , 1000 )
+likelihood <- dbinom(6, size = 9, prob = p_grid)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+set.seed(100)
+samples <- sample(p_grid, prob = posterior, size=1000, replace=TRUE)
+
+```
+
+```{r 3e1}
+mean(samples < 0.2)
+```
+
+```{r 3e2}
+mean(samples > 0.8)
+```
+```{r 3e3}
+mean(samples > 0.2 & samples < 0.8)
+```
+```{r 3e4-5}
+quantile(samples, c(0.2, 0.8))
+```
+```{r 3e6}
+HPDI(samples, prob = 0.66)
+```
+```{r 3e7}
+PI(samples, prob = 0.66)
+```
+
+## 3H1
+```{r 3h1, warning=FALSE, message=FALSE}
+library(rethinking)
+library(tidyverse)
+data(homeworkch3)
+
+boys <- sum(birth1, birth2)
+n_grid <- 200
+
+d <- 
+tibble(
+  prior = 1,
+  p_grid = seq(from = 0, to = 1, length.out = n_grid),
+  likelihood = dbinom(boys, size = n_grid, prob = p_grid),
+  unstd_posterior = likelihood * prior,             
+  posterior = unstd_posterior / sum(unstd_posterior)
+  )
+
+d %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_line() +
+  labs(
+    subtitle = "Grid Approximated Posterior Distrubtions",
+    x = "probability of boy birth",
+    y = "posterior probability") +
+  theme(panel.grid = element_blank())
+
+# max posterior
+filter(d, posterior == max(posterior))
+
+```
+
+## 3H2
+```{r 3h2}
+samples <- sample(d$p_grid, size=1e4, replace=TRUE, prob=d$posterior)
+
+HPDI(samples, prob=0.50)
+HPDI(samples, prob=0.89)
+HPDI(samples, prob=0.97)
+```
+
+## 3H3
+```{r 3h3}
+simulation <- rbinom(1e4, size=200, prob=samples)
+dens(simulation)
+abline(v=111)
+```
+
+## 3H4
+```{r 3h4-1}
+birth1sum <- sum(birth1)
+likelihood2 <- dbinom(birth1sum, size=100, prob=d$p_grid) 
+prior2 <- rep( 1, 100) 
+unstd.posterior2 <- likelihood2 * prior2 
+posterior2 <- unstd.posterior2 / sum(unstd.posterior2) 
+samples2 <- sample(d$p_grid, size=1e4, replace=TRUE, prob=posterior2)
+
+simulation2 <- rbinom(1e4, size=100, prob=samples2)
+dens(simulation2)
+abline(v=51)
+```
+
+
+
+```{r 3h4-2}
+simulation3 <- rbinom(1e4, size=100, prob=samples)
+dens(simulation3)
+abline(v=51)
+```
+
+
+## 3H5
+```{r 3h5}
+firstgirls <- 100 - sum(birth1)
+boysaftgirls <- birth2[birth1==0]
+simulation4 <- rbinom(1e4, size=firstgirls, prob=samples)
+dens(simulation4)
+abline(v=sum(boysaftgirls)) 
+```
