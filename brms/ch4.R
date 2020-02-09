@@ -208,8 +208,6 @@ b4.3 <-
       seed = 4)
 
 
-
-
 posterior_summary(b4.3)
 
 d2 <- 
