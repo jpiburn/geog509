@@ -1,0 +1,20 @@
+---
+title: |
+    | Geog 509: Bayesian Data Analysis
+    | Chapter 7 Problem Set
+author: "Jesse Piburn"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+7E2, 7E3
+
+7H1, 7H2, 7H4.
+
+Note, 7H1, refers to index variables "explained in Chapter 6". I think that the author means "explained in Section 5.4.4".
