@@ -24,7 +24,7 @@ There are two parameters $\mu$ and $\sigma$
 ## 4E3
 
 \[
-\Pr(\mu,\sigma|y_i) = \frac{\prod_i \mathrm{Normal} (y_i|\mu,\sigma) \mathrm{Normal} (\mu|0,10) \mathrm{Uniform}(\sigma|0,10)}{\int \int \prod_i \mathrm{Normal}(h_i|\mu,\sigma) \mathrm{Normal}(\mu|0,10) \mathrm{Uniform}(\sigma|0,10)d\mu d\sigma}
+\Pr(\mu,\sigma|y) = \frac{\prod_i \mathrm{Normal} (y_i|\mu,\sigma) \mathrm{Normal} (\mu|0,10) \mathrm{Uniform}(\sigma|0,10)}{\int \int \prod_i \mathrm{Normal}(h_i|\mu,\sigma) \mathrm{Normal}(\mu|0,10) \mathrm{Uniform}(\sigma|0,10)d\mu d\sigma}
 \]
 
 ## 4M1

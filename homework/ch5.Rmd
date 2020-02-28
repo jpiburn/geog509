@@ -1,0 +1,662 @@
+---
+title: |
+    | Geog 509: Bayesian Data Analysis
+    | Chapter 5 Problem Set
+author: "Jesse Piburn"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+## 5E1  - 5E4
+
+### 5E1
+Models 2,3, and 4 are multiple regressions
+
+### 5E2
+$l_i = latitude$, $A_i = Animal Diversity$, and $P_i = Plant Diversity$ 
+
+\[
+\begin{aligned}
+l_i &\sim \mathrm{Normal}(\mu_i,\sigma) \\
+\mu_i &= \alpha + \beta_A A_i + \beta_P P_i \\
+\alpha &\sim \mathrm{Normal}(0, 50) \\
+\beta_A &\sim \mathrm{Normal}(0, 20) \\
+\beta_P &\sim \mathrm{Normal}(0, 20) \\
+\sigma &\sim \mathrm{Uniform}(0, 50)
+\end{aligned}
+\]
+
+### 5E3
+$t_i =$ Time to PhD, $F_i =$ amount of funding, and $S_i =$ laboratory size 
+
+\[
+\begin{aligned}
+t_i &\sim \mathrm{Normal}(\mu_i,\sigma) \\
+\mu_i &= \alpha + \beta_F F_i + \beta_S S_i \\
+\alpha &\sim \mathrm{Normal}(0, 50) \\
+\beta_F &\sim \mathrm{Normal}(0, 20) \\
+\beta_S &\sim \mathrm{Normal}(0, 20) \\
+\sigma &\sim \mathrm{Uniform}(0, 50)
+\end{aligned}
+\]
+
+Assuming "positively associated" in the context of the question means recieving the degree faster
+is a positive outcome, that would mean as funding and lab size increase, time to degree would decrease.
+This would result in both funding and lab size having negative slopes.
+
+
+### 5E4
+Models 1, 3, 4 and 5 are inferentially equivalent
+
+
+### 5M3
+High divorce rate can cause a higher marriage rate in the sense that a marriage rate 
+counts the number of marriages per some fixed amount of people. If people are getting 
+divorced at a higher rate, some of those people are likely to get married again, therefore
+inreasing the number of marriages while the count of people remains the same. One potential
+way to evaluate this relationship is the regress marriage rate on both divorce rate and some
+indicator of remarriage rate.
+
+
+
+### 5M5
+In this model we could include indicators for each of the causes in the hypotheses.
+For example, higher gas prices could lead to less driving and therefore more exercise, means
+that we would want to include measures for gas price, driving (e.g. miles driven per week),
+and exercise (e.g. time exercising per week). Including the claims in the second hypothesis
+we would want to add a measure of how often people eat out at restaurants (e.g. times per week) and also a measure
+of how much they eat at the restaurant (e.g. calories per meal... assuming you could actually measure that). 
+
+
+
+## 5H1-5H3
+Things we'll need for all the questions
+```{r 5h-prep, message=FALSE, warning=FALSE}
+library(brms)
+library(tidyverse)
+library(tidybayes)
+library(bayesplot)
+library(patchwork)
+
+
+data(foxes, package = "rethinking")
+d <- foxes
+
+rm(foxes)
+```
+
+
+*note*: All of code for for generating the charts was omitted from this report as it was
+distracting and took up too much space. If interested, please see the source Rmd [here](https://github.com/jpiburn/geog509/blob/master/homework/ch5.Rmd)
+
+ 
+### 5H1
+
+#### weight ~ area
+```{r h1.1-model, message=FALSE, cache=TRUE}
+# weight ~ area
+h1.area <- 
+  brm(data = d, family = gaussian,
+      weight ~ 1 + area,
+      prior = c(
+        prior(normal(0, 10), class = Intercept),
+        prior(normal(0, 5), class = b),
+        prior(cauchy(0, 1), class = sigma)
+        ),
+      iter = 2000, warmup = 500, chains = 4, cores = 4,
+      seed = 1988)
+
+h1.area
+```
+
+```{r, echo=FALSE, message=FALSE, fig.height=1.5, fig.width=5}
+h1.area.plot <- 
+posterior_samples(h1.area) %>% 
+  select(
+    -lp__, 
+    -Intercept
+    ) %>% 
+  gather() %>% 
+  ggplot(
+    aes(x = value, y = reorder(key, value))
+    ) +
+  geom_vline(
+    xintercept = 0, 
+    color = "firebrick4", 
+    alpha = 1/10
+    ) +
+  stat_pointintervalh(
+    point_interval = mode_hdi, 
+    .width = .95, 
+    size = 3/4, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = "weight ~ area",
+    x = NULL, 
+    y = NULL
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(
+      color = alpha("firebrick4", 1/4), 
+      linetype = 3
+      ),
+    axis.text.y  = element_text(hjust = 0),
+    axis.ticks.y = element_blank())
+```
+
+
+#### weight ~  groupsize
+```{r, message=FALSE, cache=TRUE}
+# weight ~ groupsize
+h1.groupsize <- 
+  brm(data = d, family = gaussian,
+      weight ~ 1 + groupsize,
+      prior = c(
+        prior(normal(0, 10), class = Intercept),
+        prior(normal(0, 5), class = b),
+        prior(cauchy(0, 1), class = sigma)
+        ),
+      iter = 2000, warmup = 500, chains = 4, cores = 4,
+      seed = 1988)
+
+h1.groupsize
+```
+
+```{r, echo=FALSE, message=FALSE, fig.height=1.5, fig.width=5}
+h1.groupsize.plot <- 
+posterior_samples(h1.groupsize) %>% 
+  select(
+    -lp__, 
+    -Intercept
+    ) %>% 
+  gather() %>% 
+  ggplot(
+    aes(x = value, y = reorder(key, value))
+    ) +
+  geom_vline(
+    xintercept = 0, 
+    color = "firebrick4", 
+    alpha = 1/10
+    ) +
+  stat_pointintervalh(
+    point_interval = mode_hdi, 
+    .width = .95, 
+    size = 3/4, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = "weight ~ groupsize",
+    x = NULL, 
+    y = NULL
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(
+      color = alpha("firebrick4", 1/4), 
+      linetype = 3
+      ),
+    axis.text.y  = element_text(hjust = 0),
+    axis.ticks.y = element_blank())
+```
+
+
+```{r, echo=FALSE}
+f1.area <- 
+  fitted(h1.area) %>%
+  as_tibble() %>%
+  bind_cols(d)
+
+p1.area <- 
+ggplot(
+  data = f1.area,
+  aes(x = area, y = Estimate)
+  ) +
+  geom_smooth(
+    aes(ymin = Q2.5, ymax = Q97.5),
+    stat = "identity",
+    fill = "firebrick", 
+    color = "firebrick4", 
+    alpha = 1/5, 
+    size = 1/4
+    ) +
+  geom_point(
+    aes(y = weight), 
+    size = 2, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = NULL,
+    x = "Area",
+    y = "Weight"
+    ) +
+  coord_cartesian(
+    xlim = range(f1.area$area), 
+    ylim = range(f1.area$weight)
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank()
+    )  
+```
+
+```{r, echo=FALSE}
+f1.groupsize <- 
+  fitted(h1.groupsize) %>%
+  as_tibble() %>%
+  bind_cols(d)
+
+p1.groupsize <- 
+ggplot(
+  data = f1.groupsize,
+  aes(x = groupsize, y = Estimate)
+  ) +
+  geom_smooth(
+    aes(ymin = Q2.5, ymax = Q97.5),
+    stat = "identity",
+    fill = "firebrick", 
+    color = "firebrick4", 
+    alpha = 1/5, 
+    size = 1/4
+    ) +
+  geom_point(
+    aes(y = weight), 
+    size = 2, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = NULL,
+    x = "Group Size",
+    y = NULL
+    ) +
+  coord_cartesian(
+    xlim = range(f1.groupsize$groupsize), 
+    ylim = range(f1.groupsize$weight)
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank()
+    )  
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+
+area_plots <- 
+(h1.area.plot) /
+(p1.area) + 
+  plot_layout(
+    heights = c(1, 3)
+    )
+
+groupsize_plots <- 
+(h1.groupsize.plot) /
+(p1.groupsize) + 
+  plot_layout(
+    heights = c(1, 3)
+    )
+
+
+(area_plots | groupsize_plots) +
+  plot_annotation(
+    title = paste(
+      "When considered individually, groupsize has a small negative",
+      "relationship with weight\nwhile area has little to none"
+      )
+    )
+```
+
+
+## 5H2
+#### weight ~ area + groupsize
+```{r h2.1-model, message=FALSE, cache=TRUE}
+# weight ~ area + groupsize
+h2 <- 
+  brm(data = d, family = gaussian,
+      weight ~ 1 + area + groupsize,
+      prior = c(
+        prior(normal(0, 10), class = Intercept),
+        prior(normal(0, 5), class = b),
+        prior(cauchy(0, 1), class = sigma)
+        ),
+      iter = 2000, warmup = 500, chains = 4, cores = 4,
+      seed = 1988)
+h2
+```
+
+
+```{r, echo=FALSE, message=FALSE, fig.height=1.5, fig.width=5}
+h2.plot <- 
+posterior_samples(h2) %>% 
+  select(
+    -lp__, 
+    -Intercept
+    ) %>% 
+  gather() %>% 
+  ggplot(
+    aes(x = value, y = reorder(key, value))
+    ) +
+  geom_vline(
+    xintercept = 0, 
+    color = "firebrick4", 
+    alpha = 1/10
+    ) +
+  stat_pointintervalh(
+    point_interval = mode_hdi, 
+    .width = .95, 
+    size = 3/4, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = "weight ~ area + groupsize",
+    x = NULL, 
+    y = NULL
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(
+      color = alpha("firebrick4", 1/4), 
+      linetype = 3
+      ),
+    axis.text.y  = element_text(hjust = 0),
+    axis.ticks.y = element_blank())
+```
+
+```{r, echo=FALSE}
+nd <- 
+  tibble(
+   area = seq(
+      from = floor(min(d$area)), 
+      to   = ceiling(max(d$area)), 
+      length.out = 30
+      ),
+   groupsize = mean(d$groupsize)
+    )
+
+h2_mean_groupsize_plot <- 
+fitted(h2, newdata = nd) %>% 
+  as_tibble() %>% 
+  rename(
+    f_ll = Q2.5,
+    f_ul = Q97.5
+    ) %>% 
+  bind_cols(
+    predict(h2, newdata = nd) %>% 
+      as_tibble() %>% 
+      transmute(
+        p_ll = Q2.5,
+        p_ul = Q97.5
+        ),
+    nd) %>% 
+  ggplot(
+    aes(x = area, y = Estimate)
+    ) +
+  geom_ribbon(
+    aes(ymin = p_ll, ymax = p_ul),
+    fill = "firebrick", 
+    alpha = 1/5
+    ) +
+  geom_smooth(
+    aes(ymin = f_ll, ymax = f_ul),
+    stat = "identity",
+    fill = "firebrick", 
+    color = "firebrick4", 
+    alpha = 1/5, 
+    size = 1/4
+    ) +
+  coord_cartesian(
+    xlim = range(d$area), 
+    ylim = c(0, 8)
+    ) +
+  labs(
+    title = "Area vs Weight",
+    subtitle = paste0(
+      "Holding Groupsize contstant at its mean of ",
+      round(mean(d$groupsize), 2)
+      ),
+    y = NULL) + # NULL becasue we are going to combine the plots
+  theme_bw() +
+  theme(
+    panel.grid = element_blank()
+    )  
+```
+
+```{r, echo=FALSE}
+nd <- 
+  tibble(
+   groupsize = seq(
+      from = floor(min(d$groupsize)), 
+      to   = ceiling(max(d$groupsize)), 
+      length.out = 30
+      ),
+   area = mean(d$area)
+    )
+
+h2_mean_area_plot <- 
+fitted(h2, newdata = nd) %>% 
+  as_tibble() %>% 
+  rename(
+    f_ll = Q2.5,
+    f_ul = Q97.5
+    ) %>% 
+  bind_cols(
+    predict(h2, newdata = nd) %>% 
+      as_tibble() %>% 
+      transmute(
+        p_ll = Q2.5,
+        p_ul = Q97.5
+        ),
+    nd) %>% 
+  ggplot(
+    aes(x = groupsize, y = Estimate)
+    ) +
+  geom_ribbon(
+    aes(ymin = p_ll, ymax = p_ul),
+    fill = "firebrick", 
+    alpha = 1/5
+    ) +
+  geom_smooth(
+    aes(ymin = f_ll, ymax = f_ul),
+    stat = "identity",
+    fill = "firebrick", 
+    color = "firebrick4", 
+    alpha = 1/5, 
+    size = 1/4
+    ) +
+  coord_cartesian(
+    xlim = range(d$groupsize), 
+    ylim = c(0, 8)
+    ) +
+  labs(
+    title = "Groupsize vs Weight",
+    subtitle = paste0(
+      "Holding Area contstant at its mean of ",
+      round(mean(d$area), 2)
+      ),
+    y = "Weight") +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank()
+    )  
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=6}
+
+h2.plot / (h2_mean_area_plot + h2_mean_groupsize_plot) +
+  plot_layout(
+    heights = c(1, 3)
+    ) +
+  plot_annotation(
+    title = "When considered together however, the effect of both are intensified",
+    subtitle = "Area now has a very strong positive effect when accounting for groupsize"
+    )
+
+```
+
+The results here are different than when considering them invididually because we are
+asking the model a different question and when we ask a different question we shouldn't be
+surprised when we get different answers. When considering only `weight ~ area`, for example.
+We are asking, what is the predictive power of area for predicting weight? However, when
+we include groupsize as well, the question becomes what is the predictive power of area, once I
+already know groupsize.
+
+
+## 5H3
+#### weight ~ avgfood + groupsize
+```{r h3.ag-model, message=FALSE, cache=TRUE}
+# weight ~ avgfood + groupsize
+h3.ag <- 
+  brm(data = d, family = gaussian,
+      weight ~ 1 + avgfood + groupsize,
+      prior = c(
+        prior(normal(0, 10), class = Intercept),
+        prior(normal(0, 5), class = b),
+        prior(cauchy(0, 1), class = sigma)
+        ),
+      iter = 2000, warmup = 500, chains = 4, cores = 4,
+      seed = 1988)
+
+h3.ag
+```
+
+```{r, echo=FALSE, message=FALSE, fig.height=1.5, fig.width=5}
+h3.ag.plot <- 
+posterior_samples(h3.ag) %>% 
+  select(
+    -lp__, 
+    -Intercept
+    ) %>% 
+  gather() %>% 
+  ggplot(
+    aes(x = value, y = reorder(key, value))
+    ) +
+  geom_vline(
+    xintercept = 0, 
+    color = "firebrick4", 
+    alpha = 1/10
+    ) +
+  stat_pointintervalh(
+    point_interval = mode_hdi, 
+    .width = .95, 
+    size = 3/4, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = "weight ~ avgfood + groupsize",
+    x = NULL, 
+    y = NULL
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(
+      color = alpha("firebrick4", 1/4), 
+      linetype = 3
+      ),
+    axis.text.y  = element_text(hjust = 0),
+    axis.ticks.y = element_blank())
+```
+
+#### weight ~ avgfood + groupsize + area
+```{r h3.aga-model, message=FALSE, cache=TRUE}
+# weight ~ avgfood + groupsize + area
+h3.aga <- 
+  brm(data = d, family = gaussian,
+      weight ~ 1 + avgfood + groupsize + area,
+      prior = c(
+        prior(normal(0, 10), class = Intercept),
+        prior(normal(0, 5), class = b),
+        prior(cauchy(0, 1), class = sigma)
+        ),
+      iter = 2000, warmup = 500, chains = 4, cores = 4,
+      seed = 1988)
+
+h3.aga
+```
+
+```{r, echo=FALSE, message=FALSE, fig.height=1.5, fig.width=5}
+h3.aga.plot <- 
+posterior_samples(h3.aga) %>% 
+  select(
+    -lp__, 
+    -Intercept
+    ) %>% 
+  gather() %>% 
+  ggplot(
+    aes(x = value, y = reorder(key, value))
+    ) +
+  geom_vline(
+    xintercept = 0, 
+    color = "firebrick4", 
+    alpha = 1/10
+    ) +
+  stat_pointintervalh(
+    point_interval = mode_hdi, 
+    .width = .95, 
+    size = 3/4, 
+    color = "firebrick4"
+    ) +
+  labs(
+    title = "weight ~ avgfood + groupsize + area",
+    x = NULL, 
+    y = NULL
+    ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(
+      color = alpha("firebrick4", 1/4), 
+      linetype = 3
+      ),
+    axis.text.y  = element_text(hjust = 0),
+    axis.ticks.y = element_blank())
+```
+
+
+```{r, echo=FALSE, fig.height=8, fig.width=5, warning=FALSE, message=FALSE}
+layout <- "
+A
+B
+C
+D
+E
+"
+
+h1.area.plot + 
+  h1.groupsize.plot + 
+  h2.plot + 
+  h3.ag.plot +
+  h3.aga.plot + 
+  plot_layout(design = layout) +
+  plot_annotation(
+    title = "Comparison of weight prediction models"
+    ) &
+  xlim(c(-1,6.1))
+```
+
+**(a)**: `area` is a better predictor of `weight` than `avgfood` for two reasons.
+1) The amount of food available is a consequence of the area and 
+2) avgfood has very large credible intervals even when area is not included in the model because
+it has a very high correlation with both groupsize and area as seen below
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6}
+library(GGally)
+
+ggpairs(d)
+
+```
+
+&nbsp;
+
+**(b)**: This occurs because of weak identifiability in the model caused by multicollinearity between area and avgfood 
